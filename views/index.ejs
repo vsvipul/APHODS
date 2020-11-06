@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <title>APHODS</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+    <link rel="stylesheet" type="text/css" href="/css/main.css">
+</head>
+<body>
+    <form class="main-page">
+        <div class="project-header">APHODS</div>
+        <div class="project-desc">Automated Project Hosting on Docker Server.</div>
+        <div class="form-group required">
+            <label for="repoLink" class="control-label">Github Repository Link</label>
+            <input type="url" class="form-control" id="repoLink" aria-describedby="repoLinkHelp" placeholder="Enter GitHub Repo Link." required>
+            <small id="repoLinkHelp" class="form-text text-muted">Repository Link is required to pull the project to the server.</small>
+        </div>
+        <div class="form-group required" id="left">
+            <label for="subdomain" class="control-label">Subdomain</label>
+            <div class="input-group">
+                <input type="text" class="form-control" id="subdomain" aria-describedby="subdomainHelp" placeholder="Enter subdomain name." required>
+                <span class="input-group-addon domain-name">.iitmandi.co.in</span>
+            </div>
+            <small id="subdomainHelp" class="form-text text-muted">The project is hosted at the given subdomain.</small>
+        </div>
+        <div class="form-group required" id="right">
+            <label for="port" class="control-label">Port Number</label>
+            <input type="number" class="form-control" id="port" aria-describedby="portHelp" placeholder="Enter Port Number." required>
+            <small id="portHelp" class="form-text text-muted">The project is hosted at the given port on the server. </small>
+        </div>
+        <button type="submit" class="btn btn-primary submit-btn">Submit</button>
+    </form>
+    <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
+</body>
+</html>

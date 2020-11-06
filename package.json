@@ -1,0 +1,26 @@
+{
+  "name": "aphods",
+  "version": "1.0.0",
+  "description": "Automated Project Hosting on Docker Server. Done as a project for CS307- System Practicum.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/vsvipul/APHODS.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/vsvipul/APHODS/issues"
+  },
+  "homepage": "https://github.com/vsvipul/APHODS#readme",
+  "dependencies": {
+    "body-parser": "^1.19.0",
+    "ejs": "^3.1.5",
+    "express": "^4.17.1",
+    "path": "^0.12.7",
+    "serve-favicon": "^2.5.0"
+  }
+}
