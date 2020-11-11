@@ -3,8 +3,6 @@ const config = require("../config.json");
 
 function addDNSRecord(subdomain) {
     try {
-        console.log(config.key);
-        console.log(config.secret);
         const data = JSON.stringify([{
             "type": "A",
             "name": subdomain,
@@ -23,12 +21,14 @@ function addDNSRecord(subdomain) {
             }
         }
         const req = https.request(options, res => {
-            console.log(`statusCode: ${res.statusCode}`);
-            console.log('headers:', res.headers);
-            res.on('data', d => {
-                console.log(d);
+            let data = '';
+            res.on('data', (chunk) => {
+                data += chunk;
             });
-        })
+            res.on('end', () => {
+                console.log(data);
+            });
+        });
     
         req.on('error', error => {
             console.error(error);
@@ -38,7 +38,33 @@ function addDNSRecord(subdomain) {
     } catch(err) {
         console.log(err);
     }
-   
 }
 
-//addDNSRecord("test234");
+function checkIfDNSRecordAvailable(subdomain) {
+    const options = {
+        hostname: 'api.godaddy.com',
+        path: '/v1/domains/iitmandi.co.in/records/A/' + subdomain,
+        port: 443,
+        method: 'GET',
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': 'sso-key ' + config.key + ':' + config.secret
+        }
+    }
+    https.get(options, res => {
+        let data = '';
+        res.on('data', (chunk) => {
+            data += chunk;
+        });
+        res.on('end', () => {
+            const res = JSON.parse(data);
+            return res[0] == undefined;
+        });
+    }).on('error', (err) => {
+        console.log(err.message);
+    });
+}
+
+//checkIfDNSRecordAvailable('astrax');
+//checkIfDNSRecordAvailable('test2343');
+// addDNSRecord("test2345");
