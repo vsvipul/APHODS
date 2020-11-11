@@ -12,27 +12,79 @@
         <div class="project-header">APHODS</div>
         <div class="project-desc">Automated Project Hosting on Docker Server.</div>
         <div class="form-group required">
-            <label for="repoLink" class="control-label">Github Repository Link</label>
-            <input type="url" name="repoLink"  class="form-control" id="repoLink" aria-describedby="repoLinkHelp" placeholder="Enter GitHub Repo Link." required>
-            <small id="repoLinkHelp" class="form-text text-muted">Repository Link is required to pull the project to the server.</small>
+            <label for="dockerfileLink" class="control-label">Dockerfile Link</label>
+            <input type="url" name="dockerfileLink"  class="form-control" id="dockerfileLink" aria-describedby="dockerfileLinkHelp" placeholder="Enter Dockerfile Link." required>
+            <small id="dockerfileLinkHelp" class="form-text text-muted">Dockerfile is required to setup the container on the server.</small>
         </div>
         <div class="form-group required" id="left">
             <label for="subdomain" class="control-label">Subdomain</label>
             <div class="input-group">
-                <input type="text" class="form-control" name = "subdomain" id="subdomain" aria-describedby="subdomainHelp" placeholder="Enter subdomain name." required>
+                <input type="text" class="form-control" name = "subdomain" onkeyup="checkSubdomainAvailable()" id="subdomain" aria-describedby="subdomainHelp" placeholder="Enter subdomain name." required>
                 <span class="input-group-addon domain-name">.iitmandi.co.in</span>
+                <div class="invalid-feedback">
+                    This subdomain is not available.
+                </div>
+                <div class="valid-feedback">
+                    This subdomain is available.
+                </div>
             </div>
             <small id="subdomainHelp" class="form-text text-muted">The project is hosted at the given subdomain.</small>
         </div>
         <div class="form-group required" id="right">
             <label for="port" class="control-label">Port Number</label>
-            <input type="number" name="port" class="form-control" id="port" aria-describedby="portHelp" placeholder="Enter Port Number." required>
+            <input type="number" name="port" class="form-control" onkeyup="imposeMinMax()" id="port" aria-describedby="portHelp" placeholder="Enter Port Number." required>
+            <div class="invalid-feedback">
+                Port number should be in the range 1-65536.
+            </div>
+            <div class="valid-feedback">
+                This port number is good.
+            </div>
             <small id="portHelp" class="form-text text-muted">The project is hosted at the given port on the server. </small>
         </div>
-        <button type="submit" class="btn btn-primary submit-btn">Submit</button>
+        <div class="form-group submit-btn-group">
+            <button type="submit" class="btn btn-primary submit-btn">Submit</button>
+        </div>     
     </form>
     <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
+    <script>
+        var timer = null;
+        function checkSubdomainAvailable() {
+            document.getElementById("subdomain").classList.remove("is-invalid");
+            document.getElementById("subdomain").classList.remove("is-valid");
+            clearTimeout(timer);
+            timer = setTimeout(() => {
+                var cur = document.getElementById("subdomain").value;
+                if (cur != ""){
+                    var xhttp = new XMLHttpRequest();
+                    xhttp.open("GET", "/dns/"+cur, false);
+                    xhttp.send();
+                    var isAvailable = (xhttp.responseText == "true")
+                    if (isAvailable){
+                        document.getElementById("subdomain").classList.remove("is-invalid");
+                        document.getElementById("subdomain").classList.add("is-valid");
+                    } else {
+                        document.getElementById("subdomain").classList.remove("is-valid");
+                        document.getElementById("subdomain").classList.add("is-invalid");
+                    }
+                }
+            }, 1500);
+        }
+        function imposeMinMax() {
+            const min=1;
+            const max=65536;
+            const cur_value = document.getElementById("port").value;
+            if (cur_value != ""){
+                if (parseInt(cur_value) < min || parseInt(cur_value) > max) {
+                    document.getElementById("port").classList.remove("is-valid");
+                    document.getElementById("port").classList.add("is-invalid");
+                } else {
+                    document.getElementById("port").classList.remove("is-invalid");
+                    document.getElementById("port").classList.add("is-valid");
+                }
+            }
+        }
+    </script>
 </body>
 </html>

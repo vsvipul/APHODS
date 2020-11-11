@@ -1,7 +1,9 @@
+var helper = {};
 const https = require('https');
 const config = require("../config.json");
 
-function addDNSRecord(subdomain) {
+helper.addDNSRecord = async(req, res, next) => {
+    const subdomain = req.params.id;
     try {
         const data = JSON.stringify([{
             "type": "A",
@@ -40,7 +42,8 @@ function addDNSRecord(subdomain) {
     }
 }
 
-function checkIfDNSRecordAvailable(subdomain) {
+helper.checkDNSRecordAvailable = async(req, res, next) => {
+    const subdomain = req.params.id;
     const options = {
         hostname: 'api.godaddy.com',
         path: '/v1/domains/iitmandi.co.in/records/A/' + subdomain,
@@ -51,20 +54,18 @@ function checkIfDNSRecordAvailable(subdomain) {
             'Authorization': 'sso-key ' + config.key + ':' + config.secret
         }
     }
-    https.get(options, res => {
+    https.get(options, resp => {
         let data = '';
-        res.on('data', (chunk) => {
+        resp.on('data', (chunk) => {
             data += chunk;
         });
-        res.on('end', () => {
-            const res = JSON.parse(data);
-            return res[0] == undefined;
+        resp.on('end', () => {
+            const resp = JSON.parse(data);
+            res.send(resp[0] == undefined);
         });
     }).on('error', (err) => {
         console.log(err.message);
     });
 }
 
-//checkIfDNSRecordAvailable('astrax');
-//checkIfDNSRecordAvailable('test2343');
-// addDNSRecord("test2345");
+module.exports = helper;
