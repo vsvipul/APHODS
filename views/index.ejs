@@ -12,6 +12,16 @@
         <div class="project-header">APHODS</div>
         <div class="project-desc">Automated Project Hosting on Docker Server.</div>
         <div class="form-group required">
+            <label class="control-label">Select the type of config.</label><br>
+            <label class="radio-inline"><input type="radio" id="optradiodockerfile" name="optradio" value="dockerfile" onChange="optradioChanged()" checked>Dockerfile Link</label>
+            <label class="radio-inline"><input type="radio" id="optradiodockerimage" name="optradio" value="dockerImage" onChange="optradioChanged()">Public Docker Image</label>
+        </div>
+        <div class="form-group required d-none" id="dockerImageGroup">
+            <label for="dockerImage" class="control-label">Public Docker Image</label>
+            <input type="text" name="dockerImage"  class="form-control" id="dockerImage" aria-describedby="dockerImageHelp" placeholder="Enter Docker Image Name.">
+            <small id="dockerImageHelp" class="form-text text-muted">Docker Image is required to setup the container on the server.</small>
+        </div>
+        <div class="form-group required" id="dockerfileGroup">
             <label for="dockerfileLink" class="control-label">Dockerfile Link</label>
             <input type="url" name="dockerfileLink"  class="form-control" id="dockerfileLink" aria-describedby="dockerfileLinkHelp" placeholder="Enter Dockerfile Link." required>
             <small id="dockerfileLinkHelp" class="form-text text-muted">Dockerfile is required to setup the container on the server.</small>
@@ -86,6 +96,19 @@
             } else {
                 document.getElementById("port").classList.remove("is-valid");
                 document.getElementById("port").classList.remove("is-invalid");
+            }
+        }
+        function optradioChanged(){
+            if (document.getElementById('optradiodockerfile').checked) {
+                document.getElementById("dockerImageGroup").classList.add("d-none");
+                document.getElementById("dockerfileGroup").classList.remove("d-none");
+                document.getElementById("dockerImage").required = false;
+                document.getElementById("dockerfileLink").required = true;
+            } else if(document.getElementById('optradiodockerimage').checked) {
+                document.getElementById("dockerfileGroup").classList.add("d-none");
+                document.getElementById("dockerImageGroup").classList.remove("d-none");
+                document.getElementById("dockerfileLink").required = false;
+                document.getElementById("dockerImage").required = true;
             }
         }
     </script>
