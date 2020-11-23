@@ -7,7 +7,7 @@ var favicon = require('serve-favicon');
 var publicRoute = require("./routes/index");
 var dnsRoute = require("./routes/dns");
 
-const port = 3000;
+const port = 24020;
 app.set("view engine", "ejs");
 app.set("views", path.join(__dirname, "views"));
 app.use(bodyParser.json({ limit: "30MB", extended: true }));
@@ -20,5 +20,5 @@ app.use("/", publicRoute);
 app.use("/dns", dnsRoute);
 
 app.listen(port, function () {
-  console.log('Example app listening on port 3000!');
+  console.log('Example app listening on port 24020!');
 });
