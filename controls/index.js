@@ -33,6 +33,12 @@ helper.handleQuery = async(req, res, next) => {
     } else if (formdata.optradio == "dockerImage") {
         // Do this if dockerImage selected
         // Use formdata.dockerImage
+        console.log("docker run -dit " + formdata.dockerImage);
+        const childProcess = exec("docker run -dit " + formdata.dockerImage);
+        childProcess.stdout.pipe(process.stdout);
+        childProcess.stderr.pipe(process.stderr);
+
+        // Need to check -it vs -dit (or can be provided as options later).
     }
 }
 
