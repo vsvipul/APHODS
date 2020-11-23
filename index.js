@@ -6,6 +6,7 @@ var favicon = require('serve-favicon');
 
 var publicRoute = require("./routes/index");
 var dnsRoute = require("./routes/dns");
+var dockerodeRoute = require("./routes/dockerode");
 
 const port = 24020;
 app.set("view engine", "ejs");
@@ -18,6 +19,7 @@ app.use(express.static(path.join(__dirname, "public")))
 
 app.use("/", publicRoute);
 app.use("/dns", dnsRoute);
+app.use("/dockerode", dockerodeRoute);
 
 app.listen(port, function () {
   console.log('Example app listening on port 24020!');
