@@ -4,7 +4,7 @@ const Handlebars = require('handlebars');
 
 function addRecord(subdomain, port) {
     const inputFileStream = fs.createReadStream('../templates/nginx-template.hbs');
-    const outputFileStream = fs.createWriteStream('/etc/nginx/sites-enabled/'+subdomain, { flags: 'r+', defaultEncoding: 'utf8' });
+    const outputFileStream = fs.createWriteStream('/etc/nginx/sites-enabled/'+subdomain, { flags: 'w+', defaultEncoding: 'utf8' });
     const rl = readline.createInterface({
         input: inputFileStream,
         crlfDelay: Infinity
@@ -20,3 +20,4 @@ function addRecord(subdomain, port) {
         outputFileStream.close();
     })
 }
+//addRecord("abcd",1234);
