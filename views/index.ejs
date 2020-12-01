@@ -26,6 +26,11 @@
             <input type="url" name="dockerfileLink"  class="form-control" id="dockerfileLink" aria-describedby="dockerfileLinkHelp" placeholder="Enter Dockerfile Link." required>
             <small id="dockerfileLinkHelp" class="form-text text-muted">Dockerfile is required to setup the container on the server.</small>
         </div>
+        <div class="form-group required">
+            <label class="control-label">Select running mode during "docker run": </label><br>
+            <label class="radio-inline"><input type="radio" id="optradiodit" name="optradioRunMode" value="dit" checked>Detached interactive (-dit)</label>
+            <label class="radio-inline"><input type="radio" id="optradiod" name="optradioRunMode" value="d">Detached (-d) only</label>
+        </div>
         <div class="form-group required" id="left">
             <label for="subdomain" class="control-label">Subdomain</label>
             <div class="input-group">
