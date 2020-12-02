@@ -20,14 +20,23 @@ cd to the repo directory and install the dependencies
 $ npm install
 ```
 
+Initialize the sqlite database using
+```bash
+$ node init_db.js
+```
+
 Run the application
 ```bash
 $ nodemon
 ```
 
-The server runs at port 3000 i.e. http://localhost:3000/
+The server runs at port 24020 i.e. http://localhost:24020/
 
-You need to set the Godaddy API Key and Secret. Duplicate the file ```config-sample.json``` and rename it to ```config.json``` and modify it to add your Godaddy API Key and Secret.
+You need to set the Godaddy DNS API Key and Secret. Duplicate the file ```dns-config-sample.json``` and rename it to ```dns-config.json``` and modify it to add your Godaddy API Key and Secret.
+
+You also need keycloak config. Duplicate the file ```keycloak-config-sample.json``` and rename it to ```keycloak-config.json``` and modify it to add your Godaddy API Key and Secret.
+
+Each user is allowed to create a single deployment. You can set the max deployments allowed on the server in ```init_db.js```.
 
 ## File Structure
 

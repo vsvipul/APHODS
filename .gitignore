@@ -1,3 +1,4 @@
 node_modules/
 config/dns-config.json
 config/keycloak-config.json
+database.sqlite3

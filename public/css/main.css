@@ -24,6 +24,13 @@ body {
     margin: 0 0 40px 0;
 }
 
+.project-err {
+    text-align: center;
+    font-size: 18px;
+    font-weight: bold;
+    margin: 20px 0 40px 0;
+}
+
 .domain-name {
     padding: 10px 0 0 0;
 }

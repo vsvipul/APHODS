@@ -23,9 +23,12 @@
                 </li> -->
             </ul>
             <ul class="navbar-nav right">
-                <% if (username) { %>
                 <li class="nav-item">
-                    <a class="nav-link" href="#"><%= username %> (<%= name %>)</a>
+                    <a class="nav-link" href="#"><%= count %>/<%= limit %> Projects Hosted</a>
+                </li>
+                <% if (userid) { %>
+                <li class="nav-item">
+                    <a class="nav-link" href="#"><%= userid %> (<%= name %>)</a>
                 </li>
                 <% } %>
                 <li class="nav-item">
