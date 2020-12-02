@@ -1,6 +1,6 @@
 var helper = {};
 const https = require('https');
-const config = require("../config.json");
+const config = require("../config/dns-config.json");
 
 helper.addDNSRecord = async(req, res, next) => {
     const subdomain = req.params.id;

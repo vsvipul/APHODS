@@ -6,7 +6,10 @@ const { exec } = require('child_process');
 let containerId = 0; 
 
 helper.mainPage = async(req, res, next) => {
-    res.render("index");
+    res.render("index", {
+        username: req.kauth.grant.access_token.content.preferred_username,
+        name: req.kauth.grant.access_token.content.given_name
+    });
 }
 
 const dockerRun = (command, res) => {
