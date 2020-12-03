@@ -14,6 +14,7 @@ const { generateHash } = require('random-hash');
 const client = redis.createClient();
 
 var Docker = require('dockerode');
+const { stdout } = require('process');
 var docker = new Docker({socketPath: '/var/run/docker.sock'});
 
 helper.mainPage = async(req, res, next) => {
@@ -156,28 +157,30 @@ helper.createDeployment = async(req, res, next) => {
     const dao = new AppDAO('database.sqlite3');
     const dockerDetails = new DockerDetails(dao);
     const deplCount = new DeploymentCount(dao);
-
     // Step 1
     helper.getNewContainer(res, formdata)
     .then((containerid) => {
         console.log(containerid);
-        const passwd = generateHash({length: 10});
-        client.set("dockssh:" + containerid + ":pass", passwd, ()=>{
-    // Step 3
-            DNS.addDNSRecord(subdomain)
-            .then(() => {
-                // Step 4
-                RevProxy.addRecord(subdomain, port)
+        exec("docker container port " + containerid + " " + port, (error, stdout, stderr) => { 
+            const hostport = stdout.split(":")[1].split("\n")[0];
+            const passwd = generateHash({length: 10});
+            client.set("dockssh:" + containerid + ":pass", passwd, ()=>{
+                // Step 3
+                DNS.addDNSRecord(subdomain)
                 .then(() => {
-                    // Step 5
-                    // TODO Add along with formdata with whatever user needs to see about the container
-                    dockerDetails.insertDetail(userid, containerid, subdomain, port, passwd)
+                    // Step 4
+                    RevProxy.addRecord(subdomain, hostport)
                     .then(() => {
-                        // Step 6
-                        deplCount.increaseCount()
-                        .then(()=> {
-                            // Step 7
-                            res.redirect('back');
+                        // Step 5
+                        // TODO Add along with formdata with whatever user needs to see about the container
+                        dockerDetails.insertDetail(userid, containerid, subdomain, port, hostport, passwd)
+                        .then(() => {
+                            // Step 6
+                            deplCount.increaseCount()
+                            .then(()=> {
+                                // Step 7
+                                res.redirect('back');
+                            });
                         });
                     });
                 });
