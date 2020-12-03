@@ -28,6 +28,8 @@
     "https": "^1.0.0",
     "keycloak-connect": "^11.0.3",
     "path": "^0.12.7",
+    "random-hash": "^4.0.1",
+    "redis": "^3.0.2",
     "serve-favicon": "^2.5.0",
     "sqlite3": "^5.0.0"
   }

@@ -9,8 +9,13 @@ const DNS = require('./dns');
 const DeploymentCount = require('./../models/deployment_count')
 const DeploymentLimit = require('./../models/deployment_limit')
 const DockerDetails = require("./../models/docker_details");
+const redis = require('redis');
+const { generateHash } = require('random-hash');
+const client = redis.createClient();
 
-let containerId = 0; 
+var Docker = require('dockerode');
+const Dockerode = require('dockerode');
+var docker = new Docker({socketPath: '/var/run/docker.sock'});
 
 helper.mainPage = async(req, res, next) => {
     const userid = req.kauth.grant.access_token.content.preferred_username;
@@ -56,56 +61,82 @@ helper.mainPage = async(req, res, next) => {
     });
 }
 
-const dockerRun = (command, res) => {
-    const childProcess = exec(command, (error, stdout, stderr) => {
-        if (error==null)
-        res.render('postsubmit', {message: 'Container is running!', details: {}});
-        else res.render('postsubmit', {message: 'Docker run failed!', error: {command, stdout, stderr}});
+// const dockerRun = (command, res) => {
+//     const childProcess = exec(command, (error, stdout, stderr) => {
+//         if (error==null)
+//         res.render('postsubmit', {message: 'Container is running!', details: {}});
+//         else res.render('postsubmit', {message: 'Docker run failed!', error: {command, stdout, stderr}});
+//     });
+// }
+
+helper.stopContainer = (containerid) => {
+    return new Promise((resolve, reject) => {
+        exec("docker stop " + containerid, (error, stdout, stderr) => {
+            if (error==null) resolve();
+            else reject();
+        });
     });
-    childProcess.stdout.pipe(process.stdout);
-    childProcess.stderr.pipe(process.stderr);
 }
 
-
-helper.handleQuery = async(req, res, next) => {
-    containerId++;
-    const formdata = req.body;
-    // console.log(formdata.dockerfileLink);
-    // console.log(formdata.subdomain);
-    // console.log(formdata.port);
-    console.log(formdata);
-    if (formdata.optradio == "dockerfile") {
-        // Do this if dockerfile selected
-        // Use formdata.dockerfileLink
-        // fs.mkdirSync("./containers/" + containerId, { recursive: true });
-        // const file = fs.createWriteStream("./containers/"+containerId + "/Dockerfile");
-        // const request = https.get(formdata.dockerfileLink, function(response) {
-        //     response.pipe(file);
-        //     process.chdir("./containers/"+containerId);
-        //     const childProcess = exec("docker build -t c"+ containerId + " . && docker run -it c" + containerId);
-        //     childProcess.stdout.pipe(process.stdout);
-        //     childProcess.stderr.pipe(process.stderr);
-        //     process.chdir("../..");
-        // });
-    } else if (formdata.optradio == "dockerImage") {
-        // Do this if dockerImage selected
-        // Use formdata.dockerImage
-        res.render('postsubmit', {message: 'Pulling Docker image'}, () => {
-            let command = "docker run -";
-            command += formdata.optradioRunMode;
-            command += (" -p " + formdata.port);
+helper.getNewContainer = (res,formdata) => {
+    return new Promise((resolve, reject) =>  {
+        let containerNum = generateHash({length: 10});
+        let command = "docker run -";
+        command += formdata.optradioRunMode;
+        command += (" -p " + formdata.port);
+        console.log(formdata);
+        if (formdata.optradio == "dockerfile") {
+            // Do this if dockerfile selected
+            // Use formdata.dockerfileLink
+            fs.mkdirSync("./containers/" + containerNum, { recursive: true });
+            const file = fs.createWriteStream("./containers/"+containerNum + "/Dockerfile");
+            command += (" autohosting"+ containerNum);
+            const request = https.get(formdata.dockerfileLink, function(response) {
+                response.pipe(file);
+                process.chdir("./containers/"+containerNum);
+                const buildProcess = exec("docker build -t autohosting"+ containerNum + " . ", (error, stdout,stderr) => {
+                    process.chdir("../..");
+                    if (error==null)
+                    {
+                        const runProcess = exec(command, (error, stdout, stderr) => {
+                            if (error==null) resolve(stdout.split("\n")[0]);
+                            else 
+                            {
+                                res.render('postsubmit', {message: 'Docker run failed!', error: {command, stdout, stderr}});
+                                reject(stderr);
+                            }
+                        });
+                    }
+                    else 
+                    {
+                        res.render('postsubmit', {message: 'Error building Dockerfile', error: {command: ("docker build") , stdout, stderr}});
+                        reject(stderr);
+                    }
+                });
+                buildProcess.stdout.pipe(process.stdout);
+                buildProcess.stderr.pipe(process.stderr);
+            });
+        } else if (formdata.optradio == "dockerImage") {
+            // Do this if dockerImage selected
+            // Use formdata.dockerImage
             command += (" " + formdata.dockerImage);
             const pullProcess = exec("docker pull " + formdata.dockerImage, (error, stdout, stderr)=> {
                 if (error==null) {
-                    res.render('postsubmit', {message: 'Starting container'} , () => {
-                        console.log(command);
-                        dockerRun(command, res);
+                    const runProcess = exec(command, (error, stdout, stderr) => {
+                        if (error==null) resolve(stdout.split("\n")[0]);
+                        else {
+                            res.render('postsubmit', {message: 'Docker run failed!', error: {command, stdout, stderr}});
+                            reject(stderr);
+                        }
                     });
                 }
-                else res.render('postsubmit', {message: 'Error pulling image', error: {command: ("docker pull " + formdata.dockerImage) , stdout, stderr}});
+                else {
+                    res.render('postsubmit', {message: 'Error pulling image', error: {command: ("docker pull " + formdata.dockerImage) , stdout, stderr}});
+                    reject(stderr);
+                }
             });
-        });
-    }
+        }
+    });
 }
 
 helper.createDeployment = async(req, res, next) => {
@@ -121,31 +152,39 @@ helper.createDeployment = async(req, res, next) => {
     It will automatically show the details of the container along with option to delete it.
     */
     const formdata = req.body;
-    const { subdomain, port } = formdata;
+    const { subdomain, port  } = formdata;
     const userid = req.kauth.grant.access_token.content.preferred_username;
     const dao = new AppDAO('database.sqlite3');
     const dockerDetails = new DockerDetails(dao);
     const deplCount = new DeploymentCount(dao);
 
+    // Step 1
+    helper.getNewContainer(res, formdata)
+    .then((containerid) => {
+        console.log(containerid);
+        const passwd = generateHash({length: 10});
+        client.set("dockssh:" + containerid + ":pass", passwd, ()=>{
     // Step 3
-    DNS.addDNSRecord(subdomain)
-    .then(() => {
-        // Step 4
-        RevProxy.addRecord(subdomain)
-        .then(() => {
-            // Step 5
-            // TODO Add along with formdata with whatever user needs to see about the container
-            dockerDetails.insertDetail(userid, subdomain, port)
+            DNS.addDNSRecord(subdomain)
             .then(() => {
-                // Step 6
-                deplCount.increaseCount()
-                .then(()=> {
-                    // Step 7
-                    res.redirect('back');
+                // Step 4
+                RevProxy.addRecord(subdomain, port)
+                .then(() => {
+                    // Step 5
+                    // TODO Add along with formdata with whatever user needs to see about the container
+                    dockerDetails.insertDetail(userid, containerid, subdomain, port, passwd)
+                    .then(() => {
+                        // Step 6
+                        deplCount.increaseCount()
+                        .then(()=> {
+                            // Step 7
+                            res.redirect('back');
+                        });
+                    });
                 });
             });
         });
-    });
+    }).catch((error)=>{console.log(error)});
 }
 
 helper.deleteDeployment = async(req, res, next) => {
@@ -166,11 +205,15 @@ helper.deleteDeployment = async(req, res, next) => {
     const dockerDetails = new DockerDetails(dao);
     const deplCount = new DeploymentCount(dao);
 
-    
+
     dockerDetails.getDetails(userid)
     .then((details) => {
         console.log(details);
-        return details.subdomain;
+        helper.stopContainer(details.containerid).then(()=>{
+            client.del("dockssh:" + details.containerid + ":pass", ()=>{
+                return details.subdomain;
+            });
+        });
     })
     .then((subdomain) => {
         // Step 3 1st part
