@@ -14,7 +14,6 @@ const { generateHash } = require('random-hash');
 const client = redis.createClient();
 
 var Docker = require('dockerode');
-const Dockerode = require('dockerode');
 var docker = new Docker({socketPath: '/var/run/docker.sock'});
 
 helper.mainPage = async(req, res, next) => {
@@ -211,38 +210,37 @@ helper.deleteDeployment = async(req, res, next) => {
         console.log(details);
         helper.stopContainer(details.containerid).then(()=>{
             client.del("dockssh:" + details.containerid + ":pass", ()=>{
-                return details.subdomain;
-            });
-        });
-    })
-    .then((subdomain) => {
-        // Step 3 1st part
-        DNS.getAllDNSRecords(subdomain)
-        .then((records) => {
-            var recordsArr = JSON.parse(records);
-            return recordsArr.filter((item) => item.name !== subdomain);
-        })
-        .then((records) => {
-            // Step 3 2nd part
-            DNS.replaceAllDNSRecords(records)
-            .then(() => {
-                // Step 4
-                RevProxy.removeRecord(subdomain)
-                .then(() => {
-                    // Step 5
-                    dockerDetails.removeDetails(userid)
+                const subdomain = details.subdomain;
+                // Step 3 1st part
+                DNS.getAllDNSRecords(subdomain)
+                .then((records) => {
+                    var recordsArr = JSON.parse(records);
+                    return recordsArr.filter((item) => item.name !== subdomain);
+                })
+                .then((records) => {
+                    // Step 3 2nd part
+                    DNS.replaceAllDNSRecords(records)
                     .then(() => {
-                        // Step 6
-                        deplCount.decreaseCount()
-                        .then(()=> {
-                            // Step 7
-                            res.redirect('back');
+                        // Step 4
+                        RevProxy.removeRecord(subdomain)
+                        .then(() => {
+                            // Step 5
+                            dockerDetails.removeDetails(userid)
+                            .then(() => {
+                                // Step 6
+                                deplCount.decreaseCount()
+                                .then(()=> {
+                                    // Step 7
+                                    res.redirect('back');
+                                });
+                            });
                         });
                     });
                 });
             });
         });
     });
+    
 }
 
 module.exports = helper;

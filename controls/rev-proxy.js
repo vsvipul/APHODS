@@ -2,6 +2,7 @@ const fs = require('fs');
 const path = require('path');
 const readline = require('readline');
 const Handlebars = require('handlebars');
+const { exec } = require('child_process');
 var helper = {};
 
 helper.addRecord = (subdomain, port) => {
@@ -21,7 +22,14 @@ helper.addRecord = (subdomain, port) => {
         });
         rl.on('close', function() {
             outputFileStream.close();
-            resolve();
+            exec("sudo nginx -s reload", (error, stdout, stderr) => {
+                if (error==null) resolve();
+                else
+                {
+                    console.log(error);
+                    reject();
+                }
+            });
         });
     });
 }
@@ -34,7 +42,14 @@ helper.removeRecord = (subdomain) => {
                 console.log(err);
                 reject();
             }
-            resolve();
+            exec("sudo nginx -s reload", (error, stdout, stderr) => {
+                if (error==null) resolve();
+                else
+                {
+                    console.log(error);
+                    reject();
+                }
+            });
         });
     });
 }

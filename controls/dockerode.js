@@ -6,6 +6,7 @@ helper.getAllUsedPorts = async(req, res, next) => {
     docker.listContainers({all: true}, function(err, containers) {
         ports = [];
         for (container of containers) {
+            console.log(container['Ports']);
             for (port of container['Ports']) {
                 ports.push(port['PublicPort']);
             }
