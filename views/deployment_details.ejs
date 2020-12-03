@@ -40,18 +40,11 @@
     <form class="main-page" action="/delete" method="POST">
         <div class="project-header">APHODS</div>
         <div class="project-desc">Automated Project Hosting on Docker Server.</div>
-        <div class="form-group" id="left">
-            <label for="subdomain" class="control-label">Subdomain</label>
-            <div class="input-group">
-                <input type="text" value="<%= details.subdomain %>" class="form-control" name = "subdomain" id="subdomain" aria-describedby="subdomainHelp" readonly>
-                <span class="input-group-addon domain-name">.iitmandi.co.in</span>
-            </div>
-            <small id="subdomainHelp" class="form-text text-muted">The project is hosted at the given subdomain.</small>
-        </div>
-        <div class="form-group" id="right">
-            <label for="port" class="control-label">Port Number</label>
-            <input type="number" value="<%= details.port %>" class="form-control" id="port" aria-describedby="portHelp" readonly>
-            <small id="portHelp" class="form-text text-muted">The project is hosted at the given port on the server. </small>
+        <div class="form-group">
+            <p>The project is hosted at <a href="https://<%= details.subdomain %>.iitmandi.co.in">https://<%= details.subdomain %>.iitmandi.co.in</a></p>
+	    <p>Container port <%= details.port %> mapped to host port <%= details.hostport %> </p>
+	    <p>Run "ssh <%= details.containerid %>@iitmandi.co.in -p 22022" for ssh access</p>
+	    <p>Password for SSH: <%= details.passwd %> </p>
         </div>
         <div class="form-group submit-btn-group">
             <button type="submit" class="btn btn-primary submit-btn">Delete Container</button>

@@ -80,7 +80,7 @@ helper.stopContainer = (containerid) => {
 
 helper.getNewContainer = (res,formdata) => {
     return new Promise((resolve, reject) =>  {
-        let containerNum = generateHash({length: 10});
+        let containerNum = generateHash({length: 12, charset: 'abcdefghijklmnop'});
         let command = "docker run -";
         command += formdata.optradioRunMode;
         command += (" -p " + formdata.port);
