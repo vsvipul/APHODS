@@ -10,6 +10,7 @@ class DockerDetails {
         containerid TEXT,
         subdomain TEXT,
         port NUMBER,
+        hostport NUMBER,
         passwd TEXT
       )`;
       return this.dao.run(sql);
@@ -20,10 +21,10 @@ class DockerDetails {
         `SELECT * FROM docker_details where userid=?`,[userid]);
     }
 
-    insertDetail(userid, containerid, subdomain, port, passwd) {
+    insertDetail(userid, containerid, subdomain, port,hostport, passwd) {
       return this.dao.run(
-        'INSERT INTO docker_details (userid, containerid, subdomain, port, passwd) VALUES (?, ?, ?, ?, ?)',
-        [userid, containerid, subdomain, port, passwd]);
+        'INSERT INTO docker_details (userid, containerid, subdomain, port, hostport ,passwd) VALUES (?, ?, ?, ?, ?, ?)',
+        [userid, containerid, subdomain, port, hostport, passwd]);
     }
 
     removeDetails(userid) {
